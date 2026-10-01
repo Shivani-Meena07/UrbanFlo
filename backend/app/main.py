@@ -1,3 +1,4 @@
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
@@ -52,7 +53,14 @@ def create_app() -> FastAPI:
 
     app.include_router(router, prefix="/api")
 
+    # Static mount for uploaded hazard photos
+    uploads_dir = Path(__file__).resolve().parents[2] / "uploads"
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+
     return app
+
 
 
 app = create_app()

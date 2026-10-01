@@ -267,3 +267,114 @@ Estimated onset: 42 minutes
         Citizen & Authority Reports
                      │
                      └──────────────► Model Update
+
+---
+
+## 🚀 Quick Start / How to Run Locally
+
+You can easily run INUNDRA on your computer in **2 simple steps**.
+
+### 📋 Prerequisites
+- **Python 3.10+** (Python 3.11 recommended)
+- **Node.js 18+** & **npm**
+
+---
+
+### Step 1: Start the Backend (FastAPI)
+
+#### On Windows (PowerShell / Command Prompt):
+```powershell
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Create virtual environment
+python -m venv .venv
+
+# 3. Activate virtual environment
+.\.venv\Scripts\activate
+
+# 4. Install backend dependencies
+pip install -r requirements.txt
+
+# 5. Start the server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+#### On macOS / Linux:
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Create virtual environment
+python3 -m venv .venv
+
+# 3. Activate virtual environment
+source .venv/bin/activate
+
+# 4. Install backend dependencies
+pip install -r requirements.txt
+
+# 5. Start the server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+> **Backend is running at:** `http://localhost:8000`  
+> **Interactive API Docs (Swagger):** `http://localhost:8000/docs`
+
+---
+
+### Step 2: Start the Frontend (React + Vite + Leaflet)
+
+Open a **new terminal window** in the project root:
+
+```bash
+# 1. Navigate to frontend directory
+cd frontend
+
+# 2. Install frontend dependencies
+npm install
+
+# 3. Start development server
+npm run dev
+```
+
+> **Frontend is live at:** `http://localhost:5173`
+
+---
+
+## 🧪 Running Automated Tests
+
+Run backend unit and integration tests (38 tests covering hydraulics, weather, routing, and APIs):
+
+```bash
+cd backend
+.\.venv\Scripts\activate    # or source .venv/bin/activate on Linux/Mac
+pytest
+```
+
+---
+
+## 🗺️ Key Features Available
+
+1. **Flood-Aware Real-World Navigation:**
+   - Real Pan-India street driving routes via OSRM + OpenStreetMap.
+   - Dynamic bottleneck detection (underpass sags turn deep glowing crimson red with stall risk tags).
+   - Flood-safe elevated corridors (e.g. Barapullah, Eastern Freeway) with 100% dry elevation profiles.
+
+2. **Vehicle Ground Clearance Switcher:**
+   - Sedan (18cm stall limit)
+   - SUV / 4x4 (34cm stall limit)
+   - Two-Wheeler / Bike (14cm stall limit)
+   - Bus / Commercial (48cm stall limit)
+
+3. **💾 Saved Routes & Daily Commutes:**
+   - One-tap route saving to local storage.
+   - View, load, and drive saved routes directly from the Saved Routes drawer.
+
+4. **Live Weather & Doppler Radar:**
+   - Real-time rainfall precipitation telemetry (Open-Meteo & RainViewer).
+   - No paid Google Maps API key required — 100% free and open-source stack.
+
+5. **Community Driver Road Intel & Citizen Photo Reporting:**
+   - Real-time road comments pinned directly onto the map by fellow drivers.
+   - 1-tap instant water hazard ping and photo uploads.

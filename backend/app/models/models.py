@@ -162,3 +162,58 @@ class CitizenReport(Base):
         default=False,
         nullable=False
     )
+
+
+class HazardPhotoReport(Base):
+    __tablename__ = "hazard_photo_reports"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True
+    )
+
+    location_name: Mapped[str] = mapped_column(
+        String(255)
+    )
+
+    latitude: Mapped[float] = mapped_column(
+        Float
+    )
+
+    longitude: Mapped[float] = mapped_column(
+        Float
+    )
+
+    depth_cm: Mapped[float] = mapped_column(
+        Float,
+        default=15.0
+    )
+
+    issue_tag: Mapped[str] = mapped_column(
+        String(80),
+        default="Waterlogging"
+    )
+
+    photo_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        String(1000),
+        nullable=True
+    )
+
+    recession_eta_min: Mapped[int] = mapped_column(
+        Integer,
+        default=30
+    )
+
+    verified: Mapped[bool] = mapped_column(
+        default=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow
+    )

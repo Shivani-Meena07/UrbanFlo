@@ -417,7 +417,220 @@ export async function updateCitizenReportStatus(
 }
 
 /* =========================================================
+   FLOOD-AWARE SAFE ROUTING & HAZARDS
+   GET  /api/route/locations
+   GET  /api/route/plan
+   POST /api/route/report-hazard
+   GET  /api/route/hazards
+========================================================= */
+
+export interface RouteLocation {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  is_flood_prone?: boolean;
+  is_underpass?: boolean;
+  is_elevated?: boolean;
+}
+
+export interface RouteEdgeDetails {
+  name: string;
+  km: number;
+  base_min: number;
+  surface: string;
+  swmm_node?: string;
+  water_depth_cm: number;
+  risk_level: string;
+  is_elevated: boolean;
+  is_underpass: boolean;
+  recession_info: {
+    recession_minutes: number;
+    recession_text: string;
+    is_clearing: boolean;
+    drainage_rate_mm_hr: number;
+    status: string;
+  };
+  runoff_info: {
+    surface_type: string;
+    surface_label: string;
+    runoff_coefficient: number;
+    rainfall_rate_mm_hr: number;
+    runoff_rate_mm_hr: number;
+    infiltration_rate_mm_hr: number;
+    description: string;
+  };
+}
+
+export interface ManeuverStep {
+  instruction: string;
+  distance_m: number;
+  duration_s: number;
+  road_name?: string;
+}
+
+export interface RoutePlanDetails {
+  path_nodes: string[];
+  coordinates: [number, number][];
+  total_km: number;
+  duration_min: number;
+  max_depth_cm: number;
+  safety_score: number;
+  safety_label: string;
+  max_recession_minutes: number;
+  recession_text: string;
+  edges: RouteEdgeDetails[];
+  maneuvers?: ManeuverStep[];
+}
+
+export interface SafeRoutePlanResponse {
+  origin: RouteLocation;
+  destination: RouteLocation;
+  is_diversion_recommended: boolean;
+  recommendation_summary: string;
+  direct_route: RoutePlanDetails;
+  safe_route: RoutePlanDetails;
+  hydraulics_summary: {
+    rain_rate_mm_hr: number;
+    engine: string;
+    active_hazards_count: number;
+  };
+}
+
+export interface HazardReportItem {
+  id: number;
+  location_name: string;
+  latitude: number;
+  longitude: number;
+  depth_cm: number;
+  issue_tag: string;
+  photo_url?: string | null;
+  description?: string | null;
+  recession_eta_min: number;
+  created_at: string;
+}
+
+export async function getRouteLocations(): Promise<RouteLocation[]> {
+  return apiRequest<RouteLocation[]>("/route/locations");
+}
+
+export async function planSafeRoute(
+  origin: string,
+  destination: string,
+  rainRateMmHr?: number
+): Promise<SafeRoutePlanResponse> {
+  const params = new URLSearchParams({
+    origin,
+    destination,
+  });
+  if (rainRateMmHr !== undefined) {
+    params.set("rain_rate_mm_hr", String(rainRateMmHr));
+  }
+  return apiRequest<SafeRoutePlanResponse>(`/route/plan?${params.toString()}`);
+}
+
+export async function getActiveHazards(): Promise<HazardReportItem[]> {
+  return apiRequest<HazardReportItem[]>("/route/hazards");
+}
+
+export async function submitHazardPhotoReport(
+  formData: FormData
+): Promise<{
+  status: string;
+  message: string;
+  hazard_id: number;
+  location_name: string;
+  depth_cm: number;
+  recession_text: string;
+  photo_url?: string | null;
+}> {
+  const headers = new Headers();
+  if (API_KEY) {
+    headers.set("X-API-Key", API_KEY);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/route/report-hazard`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload hazard photo: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function ingestTelemetryPing(data: {
+  speed_kmh: number;
+  rain_mm_hr: number;
+  latitude: number;
+  longitude: number;
+  vehicle_id?: string;
+}): Promise<{
+  status: string;
+  speed_anomaly_detected: boolean;
+  bayesian_inundation: {
+    inundation_probability: number;
+    probability_percentage: number;
+    status: string;
+    confidence_label: string;
+  };
+  reroute_active: boolean;
+}> {
+  return apiRequest("/telemetry/ingest", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export interface HydraulicsLiveParams {
+  slope?: number;
+  depth_m?: number;
+  street_width_m?: number;
+  surface_type?: string;
+  rain_rate_mm_hr?: number;
+  is_sag?: boolean;
+  speed_drop_ratio?: number;
+  crowd_pings_count?: number;
+  swmm_surcharge_ratio?: number;
+}
+
+export async function getHydraulicsLiveStatus(params?: HydraulicsLiveParams): Promise<{
+  manning_open_channel: {
+    discharge_m3_s: number;
+    flow_velocity_m_s: number;
+    hydraulic_radius_m: number;
+    roughness_n: number;
+  };
+  bayesian_sensor_fusion: {
+    inundation_probability: number;
+    probability_percentage: number;
+    status: string;
+    confidence_label: string;
+  };
+  active_telemetry_pings_cached: number;
+}> {
+  const searchParams = new URLSearchParams();
+  if (params) {
+    if (params.slope !== undefined) searchParams.set("slope", String(params.slope));
+    if (params.depth_m !== undefined) searchParams.set("depth_m", String(params.depth_m));
+    if (params.street_width_m !== undefined) searchParams.set("street_width_m", String(params.street_width_m));
+    if (params.surface_type !== undefined) searchParams.set("surface_type", params.surface_type);
+    if (params.rain_rate_mm_hr !== undefined) searchParams.set("rain_rate_mm_hr", String(params.rain_rate_mm_hr));
+    if (params.is_sag !== undefined) searchParams.set("is_sag", String(params.is_sag));
+    if (params.speed_drop_ratio !== undefined) searchParams.set("speed_drop_ratio", String(params.speed_drop_ratio));
+    if (params.crowd_pings_count !== undefined) searchParams.set("crowd_pings_count", String(params.crowd_pings_count));
+    if (params.swmm_surcharge_ratio !== undefined) searchParams.set("swmm_surcharge_ratio", String(params.swmm_surcharge_ratio));
+  }
+  const q = searchParams.toString();
+  return apiRequest(`/hydraulics/live-status${q ? `?${q}` : ""}`);
+}
+
+/* =========================================================
    API BASE URL
 ========================================================= */
 
 export { API_BASE_URL };
+
