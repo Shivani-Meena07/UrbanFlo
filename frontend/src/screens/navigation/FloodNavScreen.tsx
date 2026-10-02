@@ -147,8 +147,8 @@ function getDistanceMeters(p1: [number, number], p2: [number, number]): number {
   const dLat = (p2[0] - p1[0]) * Math.PI / 180;
   const dLon = (p2[1] - p1[1]) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(p1[0] * Math.PI / 180) * Math.cos(p2[0] * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(p1[0] * Math.PI / 180) * Math.cos(p2[0] * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -163,7 +163,7 @@ export interface SavedRouteItem {
   cityName: string;
   cityId: string;
   routeTab: "safe" | "direct";
-  vehicleProfile: VehicleProfileKey;
+  vehicleProfile: VehicleType;
   durationMin: number;
   totalKm: number;
   safetyScore: number;
@@ -498,12 +498,19 @@ export default function FloodNavScreen() {
       return;
     }
 
-    const originLoc = locations.find((l) => l.id === originId);
-    const destLoc = locations.find((l) => l.id === destinationId);
-    if (!originLoc || !destLoc) {
+    const selectedOrigin = locations.find((l) => l.id === originId);
+    const selectedDestination = locations.find((l) => l.id === destinationId);
+
+    if (!selectedOrigin || !selectedDestination) {
       setRoutePlan(null);
       return;
     }
+
+    // Store the validated locations in non-optional variables.
+    // This prevents TypeScript from treating them as possibly undefined
+    // inside the nested async function.
+    const originLoc: RouteLocation = selectedOrigin;
+    const destLoc: RouteLocation = selectedDestination;
 
     async function computeRealRoutes() {
       setLoadingRoute(true);
@@ -1472,7 +1479,7 @@ export default function FloodNavScreen() {
 
       {/* 2. FLOATING BANNER ALERT (DYNAMIC REROUTE NOTIFICATION) */}
       {hazardAlertBanner && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 w-11/12 max-w-xl bg-linear-to-r from-red-600 via-rose-600 to-amber-600 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
           <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
             <ShieldCheck className="w-5 h-5 shrink-0 text-amber-200" />
             <span>{hazardAlertBanner}</span>
@@ -1503,7 +1510,7 @@ export default function FloodNavScreen() {
       {isNavigating ? (
         <>
           {/* Top Green Navigation Banner with Step-by-Step Maneuvers */}
-          <div className="absolute top-4 left-4 right-4 sm:left-6 sm:w-[500px] z-30 bg-[#0F9D58] text-white rounded-3xl shadow-2xl p-4 border border-emerald-400/30">
+          <div className="absolute top-4 left-4 right-4 sm:left-6 sm:w-125 z-30 bg-[#0F9D58] text-white rounded-3xl shadow-2xl p-4 border border-emerald-400/30">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
                 {(() => {
@@ -1571,11 +1578,10 @@ export default function FloodNavScreen() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsDriveSimulationPlaying(!isDriveSimulationPlaying)}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all ${
-                    isDriveSimulationPlaying
+                  className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all ${isDriveSimulationPlaying
                       ? "bg-amber-400 text-slate-950"
                       : "bg-white text-emerald-800"
-                  }`}
+                    }`}
                   title="Play / Pause simulated vehicle driving along the road"
                 >
                   {isDriveSimulationPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
@@ -1584,11 +1590,10 @@ export default function FloodNavScreen() {
 
                 <button
                   onClick={() => setIsRealGpsActive(!isRealGpsActive)}
-                  className={`px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${
-                    isRealGpsActive
+                  className={`px-2.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1 transition-all border ${isRealGpsActive
                       ? "bg-blue-500 text-white border-blue-400 animate-pulse"
                       : "bg-white/20 text-white border-transparent"
-                  }`}
+                    }`}
                   title="Toggle real device GPS location tracking"
                 >
                   <Crosshair className="w-3.5 h-3.5" />
@@ -1621,11 +1626,10 @@ export default function FloodNavScreen() {
             {/* Save Route Button in Navigation Mode */}
             <button
               onClick={handleSaveCurrentRoute}
-              className={`flex items-center gap-1.5 font-bold px-3 py-2.5 rounded-2xl shadow-xl text-xs transition-all ${
-                isCurrentRouteSaved
+              className={`flex items-center gap-1.5 font-bold px-3 py-2.5 rounded-2xl shadow-xl text-xs transition-all ${isCurrentRouteSaved
                   ? "bg-emerald-600 text-white"
                   : "bg-white/95 backdrop-blur-md text-slate-800 border border-slate-200 hover:bg-slate-50"
-              }`}
+                }`}
               title="Save this route to My Routes"
             >
               <Bookmark className={`w-4 h-4 ${isCurrentRouteSaved ? "text-white fill-white" : "text-blue-600"}`} />
@@ -1677,7 +1681,7 @@ export default function FloodNavScreen() {
           {/* Top Floating Search Card (Collapsible as requested in UI flow) */}
           {isSearchCardCollapsed ? (
             <div className="absolute top-4 left-4 z-30 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/90 p-2.5 flex items-center gap-3 transition-all animate-in fade-in slide-in-from-top-2 duration-200 max-w-[calc(100vw-32px)] sm:max-w-md">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-blue-500/30">
+              <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-blue-500/30">
                 <Navigation className="w-4 h-4 fill-white" />
               </div>
 
@@ -1706,11 +1710,11 @@ export default function FloodNavScreen() {
               </button>
             </div>
           ) : (
-            <div className="absolute top-4 left-4 z-30 w-[calc(100vw-32px)] sm:w-[440px] bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-200/80 p-4 transition-all">
+            <div className="absolute top-4 left-4 z-30 w-[calc(100vw-32px)] sm:w-110 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-200/80 p-4 transition-all">
               {/* Header with Title, Live Weather Radar, and Minimize Button */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/30">
+                  <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/30">
                     <Navigation className="w-4 h-4 fill-white" />
                   </div>
                   <div>
@@ -1754,11 +1758,10 @@ export default function FloodNavScreen() {
                   <button
                     key={city.id}
                     onClick={() => handleSelectCity(city.id)}
-                    className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-all border font-semibold ${
-                      activeCityId === city.id
+                    className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-all border font-semibold ${activeCityId === city.id
                         ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                         : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200"
-                    }`}
+                      }`}
                   >
                     {city.name}
                   </button>
@@ -1988,11 +1991,10 @@ export default function FloodNavScreen() {
               <button
                 onClick={handleSaveCurrentRoute}
                 disabled={!originId || !destinationId}
-                className={`w-full mt-3 py-2.5 px-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${
-                  originId && destinationId
+                className={`w-full mt-3 py-2.5 px-3 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all ${originId && destinationId
                     ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/25 active:scale-[0.99] cursor-pointer"
                     : "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 <Bookmark className={`w-4 h-4 ${originId && destinationId ? "fill-white" : "text-slate-400"}`} />
                 <span>{originId && destinationId ? "Save & Confirm Route" : "Select Start & Destination"}</span>
@@ -2016,11 +2018,10 @@ export default function FloodNavScreen() {
                       <button
                         key={vKey}
                         onClick={() => setSelectedVehicleType(vKey)}
-                        className={`flex flex-col items-center p-1.5 rounded-xl border text-[10px] transition-all font-semibold ${
-                          isSelected
+                        className={`flex flex-col items-center p-1.5 rounded-xl border text-[10px] transition-all font-semibold ${isSelected
                             ? "bg-slate-900 text-white border-slate-900 shadow-md"
                             : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                        }`}
+                          }`}
                       >
                         <span className="text-sm">{v.icon}</span>
                         <span className="truncate w-full text-center mt-0.5">{v.label.split(" ")[0]}</span>
@@ -2058,11 +2059,10 @@ export default function FloodNavScreen() {
 
                   <button
                     onClick={handleSaveCurrentRoute}
-                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm ${
-                      isCurrentRouteSaved
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all shadow-sm ${isCurrentRouteSaved
                         ? "bg-emerald-50 text-emerald-800 border border-emerald-300"
                         : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20"
-                    }`}
+                      }`}
                     title="Save current route to My Routes for quick access"
                   >
                     <Bookmark className={`w-3.5 h-3.5 ${isCurrentRouteSaved ? "text-emerald-600 fill-emerald-500" : "text-white"}`} />
@@ -2099,9 +2099,8 @@ export default function FloodNavScreen() {
                         setMapLayerType("street");
                         setLayerMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-2 p-2 rounded-xl text-left font-semibold ${
-                        mapLayerType === "street" ? "bg-blue-50 text-blue-700 border border-blue-200" : "hover:bg-slate-100 text-slate-700"
-                      }`}
+                      className={`w-full flex items-center gap-2 p-2 rounded-xl text-left font-semibold ${mapLayerType === "street" ? "bg-blue-50 text-blue-700 border border-blue-200" : "hover:bg-slate-100 text-slate-700"
+                        }`}
                     >
                       <MapPin className="w-4 h-4 text-blue-500" />
                       <span>🗺️ Standard Street Map</span>
@@ -2112,9 +2111,8 @@ export default function FloodNavScreen() {
                         setMapLayerType("satellite");
                         setLayerMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-2 p-2 rounded-xl text-left font-semibold ${
-                        mapLayerType === "satellite" ? "bg-blue-50 text-blue-700 border border-blue-200" : "hover:bg-slate-100 text-slate-700"
-                      }`}
+                      className={`w-full flex items-center gap-2 p-2 rounded-xl text-left font-semibold ${mapLayerType === "satellite" ? "bg-blue-50 text-blue-700 border border-blue-200" : "hover:bg-slate-100 text-slate-700"
+                        }`}
                     >
                       <Compass className="w-4 h-4 text-emerald-500" />
                       <span>🛰️ High-Res Satellite (Esri)</span>
@@ -2139,7 +2137,7 @@ export default function FloodNavScreen() {
             {/* 1-Tap Quick Hazard Button (Waze-style, No photo needed) */}
             <button
               onClick={handleOneTapWaterPing}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
               title="1-Tap Instant Hazard Ping (No photo required)"
             >
               <Waves className="w-4 h-4 text-cyan-200" />
@@ -2149,7 +2147,7 @@ export default function FloodNavScreen() {
             {/* Upload Photo Button */}
             <button
               onClick={() => setPhotoModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
               title="Upload photo of flooded street to warn incoming drivers"
             >
               <Camera className="w-4 h-4" />
@@ -2159,7 +2157,7 @@ export default function FloodNavScreen() {
             {/* Community Road Intel Comment Button */}
             <button
               onClick={() => setCommentModalOpen(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-3.5 py-2.5 rounded-2xl shadow-xl font-bold text-xs transition-all transform hover:scale-105 active:scale-95"
               title="Post live driver comment / road intel on map"
             >
               <MessageSquare className="w-4 h-4" />
@@ -2170,9 +2168,8 @@ export default function FloodNavScreen() {
           {/* BOTTOM SLIDE-UP ROUTE DETAILS DRAWER (Automatically hidden when editing route) */}
           {routePlan && isSearchCardCollapsed && !isNavigating && (
             <div
-              className={`absolute bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 rounded-t-3xl shadow-2xl transition-all duration-300 ${
-                sheetExpanded ? "max-h-[52vh] sm:max-h-[44vh]" : "max-h-20"
-              } overflow-hidden flex flex-col`}
+              className={`absolute bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 rounded-t-3xl shadow-2xl transition-all duration-300 ${sheetExpanded ? "max-h-[52vh] sm:max-h-[44vh]" : "max-h-20"
+                } overflow-hidden flex flex-col`}
             >
               {/* Drawer Handle & Quick Summary Bar */}
               <div
@@ -2181,11 +2178,10 @@ export default function FloodNavScreen() {
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-3.5 h-3.5 rounded-full ${
-                      activeRoute?.safety_score && activeRoute.safety_score > 70
+                    className={`w-3.5 h-3.5 rounded-full ${activeRoute?.safety_score && activeRoute.safety_score > 70
                         ? "bg-emerald-500 ring-4 ring-emerald-100"
                         : "bg-amber-500 ring-4 ring-amber-100"
-                    }`}
+                      }`}
                   />
                   <div>
                     <div className="flex items-center gap-2">
@@ -2198,11 +2194,10 @@ export default function FloodNavScreen() {
                       </span>
                       <span className="text-slate-400">•</span>
                       <span
-                        className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                          selectedRouteTab === "safe"
+                        className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${selectedRouteTab === "safe"
                             ? "bg-emerald-100 text-emerald-800"
                             : "bg-red-100 text-red-800"
-                        }`}
+                          }`}
                       >
                         {activeRoute?.safety_label}
                       </span>
@@ -2235,11 +2230,10 @@ export default function FloodNavScreen() {
 
                   <button
                     onClick={handleSaveCurrentRoute}
-                    className={`p-3.5 rounded-2xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shrink-0 ${
-                      isCurrentRouteSaved
+                    className={`p-3.5 rounded-2xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shrink-0 ${isCurrentRouteSaved
                         ? "bg-emerald-50 text-emerald-800 border-emerald-300"
                         : "bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200"
-                    }`}
+                      }`}
                     title="Save this route to My Routes"
                   >
                     <Bookmark className={`w-5 h-5 ${isCurrentRouteSaved ? "text-emerald-600 fill-emerald-500" : "text-slate-600"}`} />
@@ -2252,11 +2246,10 @@ export default function FloodNavScreen() {
                   {/* Option A: Recommended Safe Route */}
                   <button
                     onClick={() => setSelectedRouteTab("safe")}
-                    className={`text-left p-3.5 rounded-2xl border transition-all ${
-                      selectedRouteTab === "safe"
+                    className={`text-left p-3.5 rounded-2xl border transition-all ${selectedRouteTab === "safe"
                         ? "border-emerald-500 bg-emerald-50/60 ring-2 ring-emerald-400/20"
                         : "border-slate-200 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-emerald-800 flex items-center gap-1">
@@ -2281,11 +2274,10 @@ export default function FloodNavScreen() {
                   {/* Option B: Direct Route */}
                   <button
                     onClick={() => setSelectedRouteTab("direct")}
-                    className={`text-left p-3.5 rounded-2xl border transition-all ${
-                      selectedRouteTab === "direct"
+                    className={`text-left p-3.5 rounded-2xl border transition-all ${selectedRouteTab === "direct"
                         ? "border-red-400 bg-red-50/60 ring-2 ring-red-400/20"
                         : "border-slate-200 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-700 flex items-center gap-1">
@@ -2319,15 +2311,14 @@ export default function FloodNavScreen() {
                       <Activity className="w-3.5 h-3.5 text-blue-600" />
                       Route Inundation Profile ({currentVehicle.label})
                     </span>
-                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-                      selectedRouteTab === "safe"
+                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${selectedRouteTab === "safe"
                         ? "bg-emerald-100 text-emerald-800"
                         : routePlan.direct_route.max_depth_cm >= currentVehicle.criticalDepthCm
                           ? "bg-red-100 text-red-800 animate-pulse"
                           : routePlan.direct_route.max_depth_cm > 0
                             ? "bg-amber-100 text-amber-800"
                             : "bg-slate-200 text-slate-700"
-                    }`}>
+                      }`}>
                       {selectedRouteTab === "safe"
                         ? "100% DRY ELEVATED CORRIDOR"
                         : routePlan.direct_route.max_depth_cm >= currentVehicle.criticalDepthCm
@@ -2343,18 +2334,17 @@ export default function FloodNavScreen() {
                     {selectedRouteTab === "safe" ? (
                       <>
                         <div className="bg-emerald-400 h-full flex-1" title="Approach Ramp (Dry)" />
-                        <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 h-full flex-4" title={`Elevated Deck (+14.5m Viaduct - 100% Dry)`} />
+                        <div className="bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-500 h-full flex-4" title={`Elevated Deck (+14.5m Viaduct - 100% Dry)`} />
                         <div className="bg-emerald-400 h-full flex-1" title="Exit Ramp (Dry)" />
                       </>
                     ) : routePlan.direct_route.max_depth_cm > 0 ? (
                       <>
                         <div className="bg-slate-400 h-full flex-2" title="Surface Approach Street (Dry)" />
                         <div
-                          className={`${
-                            routePlan.direct_route.max_depth_cm >= currentVehicle.criticalDepthCm
+                          className={`${routePlan.direct_route.max_depth_cm >= currentVehicle.criticalDepthCm
                               ? "bg-red-600 animate-pulse"
                               : "bg-amber-500"
-                          } h-full flex-2`}
+                            } h-full flex-2`}
                           title={`${activeCity.floodSagName} (${routePlan.direct_route.max_depth_cm}cm water)`}
                         />
                         <div className="bg-slate-400 h-full flex-2" title="Exit Surface Road (Dry)" />
@@ -2366,23 +2356,22 @@ export default function FloodNavScreen() {
 
                   {/* Realtime Start, Middle Bottleneck, and Destination Labels */}
                   <div className="flex justify-between items-center text-[10px] text-slate-600 font-semibold pt-0.5">
-                    <span className="truncate max-w-[120px] sm:max-w-[180px]" title={currentOriginName}>
+                    <span className="truncate max-w-30 sm:max-w-45" title={currentOriginName}>
                       📍 {currentOriginName}
                     </span>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                      selectedRouteTab === "safe"
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${selectedRouteTab === "safe"
                         ? "bg-emerald-50 text-emerald-800"
                         : routePlan.direct_route.max_depth_cm >= currentVehicle.criticalDepthCm
                           ? "bg-red-50 text-red-700 font-extrabold"
                           : "bg-slate-100 text-slate-700"
-                    }`}>
+                      }`}>
                       {selectedRouteTab === "safe"
                         ? `🛡️ ${activeCity.bypassName} (+14.5m Viaduct • 0cm Water)`
                         : routePlan.direct_route.max_depth_cm > 0
                           ? `⚠️ ${activeCity.floodSagName} (${routePlan.direct_route.max_depth_cm}cm water • -4.2m Sag)`
                           : `✅ ${activeCity.name} Corridor (0cm Water • Dry)`}
                     </span>
-                    <span className="truncate max-w-[120px] sm:max-w-[180px] text-right" title={currentDestName}>
+                    <span className="truncate max-w-30 sm:max-w-45 text-right" title={currentDestName}>
                       🏁 {currentDestName}
                     </span>
                   </div>
@@ -2466,7 +2455,7 @@ export default function FloodNavScreen() {
                               {livePhysics.isSafe ? "0 cm SAG" : `${livePhysics.peakDepthCm} cm DEPTH`}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-[32px]">
+                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-8">
                             {livePhysics.conduitStatus}
                           </p>
                           <div className="mt-2.5 pt-2 border-t border-slate-100/80 space-y-1 text-[10px] font-mono">
@@ -2492,7 +2481,7 @@ export default function FloodNavScreen() {
                               C = {livePhysics.runoffCoeff}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-[32px]">
+                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-8">
                             {livePhysics.surfaceType}. Green-Ampt infiltration front models ground saturation.
                           </p>
                           <div className="mt-2.5 pt-2 border-t border-slate-100/80 space-y-1 text-[10px] font-mono">
@@ -2518,7 +2507,7 @@ export default function FloodNavScreen() {
                               S = {livePhysics.roadSlopePercent}%
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-[32px]">
+                          <p className="text-[11px] text-slate-600 leading-relaxed min-h-8">
                             Q = (1/n) · A · R^(2/3) · S^(1/2). Street curb gutter discharge (n = {livePhysics.roughnessN}).
                           </p>
                           <div className="mt-2.5 pt-2 border-t border-slate-100/80 space-y-1 text-[10px] font-mono">
@@ -2544,7 +2533,7 @@ export default function FloodNavScreen() {
                               P = {livePhysics.pPercentage}%
                             </span>
                           </div>
-                          <p className="text-[11px] font-medium text-slate-700 leading-relaxed min-h-[32px]">
+                          <p className="text-[11px] font-medium text-slate-700 leading-relaxed min-h-8">
                             {livePhysics.bayesStatus}
                           </p>
                           <div className="mt-2.5 pt-2 border-t border-slate-100/80 space-y-1 text-[10px] font-mono">
@@ -2732,7 +2721,7 @@ export default function FloodNavScreen() {
                 <button
                   type="submit"
                   disabled={submittingReport}
-                  className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 transition-all text-sm"
+                  className="w-full bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 rounded-2xl shadow-lg shadow-red-500/30 flex items-center justify-center gap-2 transition-all text-sm"
                 >
                   {submittingReport ? (
                     <>
@@ -2834,33 +2823,30 @@ export default function FloodNavScreen() {
                   <button
                     type="button"
                     onClick={() => setNewCommentTag("danger")}
-                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${
-                      newCommentTag === "danger"
+                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${newCommentTag === "danger"
                         ? "bg-red-50 text-red-700 border-red-300 ring-2 ring-red-200"
                         : "bg-slate-50 text-slate-600 border-slate-200"
-                    }`}
+                      }`}
                   >
                     ⚠️ Flood Hazard
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewCommentTag("safe")}
-                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${
-                      newCommentTag === "safe"
+                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${newCommentTag === "safe"
                         ? "bg-emerald-50 text-emerald-700 border-emerald-300 ring-2 ring-emerald-200"
                         : "bg-slate-50 text-slate-600 border-slate-200"
-                    }`}
+                      }`}
                   >
                     ✓ Corridor Clear
                   </button>
                   <button
                     type="button"
                     onClick={() => setNewCommentTag("traffic")}
-                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${
-                      newCommentTag === "traffic"
+                    className={`p-2 rounded-xl border text-center font-bold text-xs transition-all ${newCommentTag === "traffic"
                         ? "bg-amber-50 text-amber-700 border-amber-300 ring-2 ring-amber-200"
                         : "bg-slate-50 text-slate-600 border-slate-200"
-                    }`}
+                      }`}
                   >
                     🚗 Traffic Crawl
                   </button>
@@ -2884,7 +2870,7 @@ export default function FloodNavScreen() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all text-sm"
+                  className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3 rounded-2xl shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all text-sm"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Pin Road Intel to Map</span>
@@ -2945,11 +2931,10 @@ export default function FloodNavScreen() {
                             {saved.cityName}
                           </span>
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              saved.routeTab === "safe"
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${saved.routeTab === "safe"
                                 ? "bg-emerald-100 text-emerald-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             {saved.routeTab === "safe" ? "Flood-Safe" : "Direct Route"}
                           </span>
