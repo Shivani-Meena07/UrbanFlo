@@ -372,7 +372,7 @@ def fetch_real_road_geometry(coords: List[List[float]]) -> Tuple[List[List[float
 
         coord_str = ";".join(f"{c[1]},{c[0]}" for c in coords)
         url = f"https://router.project-osrm.org/route/v1/driving/{coord_str}?overview=full&geometries=geojson&steps=true"
-        req = urllib.request.Request(url, headers={"User-Agent": "INUNDRA_Navigation/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "UrbanFlo_Navigation/1.0"})
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             if data.get("code") == "Ok" and data.get("routes"):

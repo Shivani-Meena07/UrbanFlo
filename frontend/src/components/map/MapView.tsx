@@ -299,7 +299,7 @@ export default function MapView() {
         }
 
         console.error(
-          "INUNDRA backend map integration error:",
+          "UrbanFlo backend map integration error:",
           error
         );
 

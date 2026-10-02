@@ -29,7 +29,7 @@ export default function AuthScreen({
 
             <div>
               <div className="text-base font-bold tracking-tight">
-                INUNDRA
+                UrbanFlo
               </div>
 
               <div className="text-[9px] font-mono uppercase tracking-wider text-warm-400">
@@ -58,7 +58,7 @@ export default function AuthScreen({
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-warm-900">
-              Welcome to INUNDRA
+              Welcome to UrbanFlo
             </h1>
 
             <p className="max-w-xl mx-auto mt-3 text-sm sm:text-base text-warm-500 leading-relaxed">
