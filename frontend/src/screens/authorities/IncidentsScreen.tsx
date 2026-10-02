@@ -908,7 +908,7 @@ export default function AuthorityIncidentsScreen() {
                 <span className="h-2 w-2 rounded-full bg-maroon-600" />
 
                 <p className="text-[10px] font-bold uppercase tracking-widest text-maroon-700">
-                  INUNDRA / Authority
+                  UrbanFlo / Authority
                 </p>
               </div>
 

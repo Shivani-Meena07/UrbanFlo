@@ -846,7 +846,7 @@ export default function SafeRouteScreen() {
                   </div>
 
                   <p className="text-[11px] text-warm-500 mt-1 leading-relaxed">
-                    INUNDRA combines the flood-model condition
+                    UrbanFlo combines the flood-model condition
                     around the destination with route-level
                     exposure information. The current prototype
                     displays demonstration route geometry while
@@ -1059,7 +1059,7 @@ export default function SafeRouteScreen() {
                   route geometry and route-specific exposure
                   values are currently demonstration data. The
                   live flood-model assessment above is fetched
-                  from the INUNDRA backend. Production deployment
+                  from the UrbanFlo backend. Production deployment
                   should connect this layer to a road-routing API,
                   live road closures, and road-segment flood
                   depths.

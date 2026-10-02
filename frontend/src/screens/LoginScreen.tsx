@@ -71,7 +71,7 @@ export default function LoginScreen({
 
             <div>
               <div className="text-base font-bold tracking-tight">
-                INUNDRA
+                UrbanFlo
               </div>
 
               <div className="text-[9px] font-mono uppercase tracking-wider text-warm-400">
@@ -303,7 +303,7 @@ export default function LoginScreen({
           {/* Bottom */}
           <div className="text-center mt-5">
             <div className="text-[9px] font-mono uppercase tracking-wider text-warm-400">
-              INUNDRA · Flood intelligence before inundation
+              UrbanFlo · Flood intelligence before inundation
             </div>
           </div>
         </div>

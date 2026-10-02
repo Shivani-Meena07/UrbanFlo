@@ -1,10 +1,10 @@
-# INUNDRA
+# UrbanFlo
 
 ## Urban Flood Nowcasting & Decision Intelligence
 
 > **Predicting Urban Inundation Before It Happens.**
 
-INUNDRA is an urban flood nowcasting and decision-support platform designed to predict **street-level urban flooding before it occurs**.
+UrbanFlo is an urban flood nowcasting and decision-support platform designed to predict **street-level urban flooding before it occurs**.
 
 The platform combines real-time rainfall information, high-resolution terrain data, urban surface characteristics, drainage-network conditions, and downstream water levels to estimate **where flooding may occur, when it may occur, and how severe it may become**.
 
@@ -34,7 +34,7 @@ This creates a need for a system that can translate rainfall forecasts into **st
 
 ## 💡 Our Solution
 
-INUNDRA introduces a coupled urban flood intelligence framework that connects:
+UrbanFlo introduces a coupled urban flood intelligence framework that connects:
 
 **Rainfall → Terrain → Surface Runoff → Drainage Network → Flood Prediction → Action**
 
@@ -42,7 +42,7 @@ Instead of only asking:
 
 > "How much rain is expected?"
 
-INUNDRA aims to answer:
+UrbanFlo aims to answer:
 
 - **WHERE** will flooding occur?
 - **WHEN** is it likely to occur?
@@ -58,7 +58,7 @@ The system continuously updates flood intelligence as new rainfall observations,
 
 ### 🌧️ Real-Time Rainfall Intelligence
 
-INUNDRA can integrate rainfall observations and forecast information from sources such as:
+UrbanFlo can integrate rainfall observations and forecast information from sources such as:
 
 - Weather stations
 - Airport observations
@@ -72,7 +72,7 @@ This information is used to estimate rainfall intensity and spatial distribution
 
 ### 🗺️ Street-Level Flood Prediction
 
-INUNDRA aims to provide high-resolution flood predictions for urban areas.
+UrbanFlo aims to provide high-resolution flood predictions for urban areas.
 
 The prediction layer can represent:
 
@@ -109,7 +109,7 @@ These factors help determine how rainfall becomes surface runoff and where water
 
 ### 🚰 Dynamic Drainage Network Model
 
-INUNDRA represents the urban drainage system as a graph.
+UrbanFlo represents the urban drainage system as a graph.
 
 #### Drainage Nodes
 
@@ -146,7 +146,7 @@ The model can estimate:
 
 Real-world drainage conditions can significantly affect flood risk.
 
-INUNDRA can incorporate reports from:
+UrbanFlo can incorporate reports from:
 
 - Citizens
 - Municipal authorities
@@ -167,7 +167,7 @@ These reports can be used to update drainage conditions and improve subsequent f
 
 ### 🌊 River & Tidal Conditions
 
-Where applicable, INUNDRA can incorporate:
+Where applicable, UrbanFlo can incorporate:
 
 - River levels
 - Canal levels
@@ -180,7 +180,7 @@ This is important because high downstream water levels can reduce drainage disch
 
 ### 🧠 Explainable Flood Intelligence
 
-INUNDRA is designed not only to predict flooding but also to explain **why** a location is at risk.
+UrbanFlo is designed not only to predict flooding but also to explain **why** a location is at risk.
 
 For example:
 
@@ -257,7 +257,7 @@ Estimated onset: 42 minutes
                    └─────────────────────────┼──────────────────────┘
                                              ▼
                                   ┌─────────────────────┐
-                                  │ INUNDRA GIS         │
+                                  │ UrbanFlo GIS         │
                                   │ Decision Dashboard  │
                                   └──────────┬──────────┘
                                              │
@@ -272,7 +272,7 @@ Estimated onset: 42 minutes
 
 ## 🚀 Quick Start / How to Run Locally
 
-You can easily run INUNDRA on your computer in **2 simple steps**.
+You can easily run UrbanFlo on your computer in **2 simple steps**.
 
 ### 📋 Prerequisites
 - **Python 3.10+** (Python 3.11 recommended)
@@ -377,4 +377,4 @@ pytest
 
 5. **Community Driver Road Intel & Citizen Photo Reporting:**
    - Real-time road comments pinned directly onto the map by fellow drivers.
-   - 1-tap instant water hazard ping and photo uploads.
+   - 1-tap instant water hazard ping and photo uploads.

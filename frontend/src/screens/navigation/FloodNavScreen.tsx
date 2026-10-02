@@ -370,7 +370,7 @@ export default function FloodNavScreen() {
   // Saved Routes State (persisted in localStorage)
   const [savedRoutes, setSavedRoutes] = useState<SavedRouteItem[]>(() => {
     try {
-      const raw = localStorage.getItem("inundra_saved_routes");
+      const raw = localStorage.getItem("UrbanFlo_saved_routes");
       return raw ? JSON.parse(raw) : [];
     } catch {
       return [];
@@ -1169,7 +1169,7 @@ export default function FloodNavScreen() {
     const updated = [newRoute, ...savedRoutes.filter((r) => r.title !== newRoute.title || r.routeTab !== newRoute.routeTab)];
     setSavedRoutes(updated);
     try {
-      localStorage.setItem("inundra_saved_routes", JSON.stringify(updated));
+      localStorage.setItem("UrbanFlo_saved_routes", JSON.stringify(updated));
     } catch (err) {
       console.error("Failed to save to localStorage", err);
     }
@@ -1202,7 +1202,7 @@ export default function FloodNavScreen() {
     const updated = savedRoutes.filter((r) => r.id !== id);
     setSavedRoutes(updated);
     try {
-      localStorage.setItem("inundra_saved_routes", JSON.stringify(updated));
+      localStorage.setItem("UrbanFlo_saved_routes", JSON.stringify(updated));
     } catch (err) {
       console.error(err);
     }
@@ -1253,7 +1253,7 @@ export default function FloodNavScreen() {
     try {
       const resp = await fetch(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + " " + activeCity.name)}&format=json&limit=5&countrycodes=in`,
-        { headers: { "User-Agent": "INUNDRA_Navigation_Demo" } }
+        { headers: { "User-Agent": "UrbanFlo_Navigation_Demo" } }
       );
       if (resp.ok) {
         const data = await resp.json();
@@ -1715,7 +1715,7 @@ export default function FloodNavScreen() {
                   </div>
                   <div>
                     <h1 className="text-sm font-bold tracking-tight text-slate-900 leading-none">
-                      INUNDRA <span className="text-blue-600 font-semibold text-xs">Maps</span>
+                      UrbanFlo <span className="text-blue-600 font-semibold text-xs">Maps</span>
                     </h1>
                     <p className="text-[10px] text-slate-500 font-medium">
                       Pan-India Flood-Aware Navigation Engine

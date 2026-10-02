@@ -100,7 +100,7 @@ export default function GlobalHeader() {
 
           <div>
             <div className="text-maroon-700 font-bold text-base tracking-tight leading-none">
-              INUNDRA
+              UrbanFlo
             </div>
 
             <div className="text-warm-500 text-[9px] leading-none tracking-wide hidden sm:block">

@@ -522,7 +522,7 @@ function ReportModal({
 
             <p className="mt-1 text-sm leading-5 text-warm-500">
               Your observation has been
-              submitted to the INUNDRA backend.
+              submitted to the UrbanFlo backend.
             </p>
           </div>
 
